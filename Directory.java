@@ -6,7 +6,7 @@ public class Directory {
     private String name;
     public Directory parent = null;
     private ArrayList<Directory> subDirs = new ArrayList<Directory>();
-    private ArrayList<File> fileObjs;
+    private ArrayList<File> fileObjs = new ArrayList<File>();
  
     public Directory(String name) {
         this.name = name;
@@ -42,6 +42,10 @@ public class Directory {
     
     public ArrayList<File> getFiles() {
         return this.fileObjs;
+    }
+
+    public File getFile(int i) {
+        return this.fileObjs.get(i);
     }
  
 }
