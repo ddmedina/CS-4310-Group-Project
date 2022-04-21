@@ -5,11 +5,19 @@ public class Directory {
     //public String mNum;
     private String name;
     public Directory parent = null;
+    private boolean renameable = false;
+    private boolean moveable = false;
+    private boolean writeable = false;
+    private boolean deleteable = false;
     private ArrayList<Directory> subDirs = new ArrayList<Directory>();
     private ArrayList<File> fileObjs = new ArrayList<File>();
  
-    public Directory(String name) {
+    public Directory(String name, boolean renameable, boolean moveable, boolean writeable, boolean deleteable) {
         this.name = name;
+        this.renameable = renameable;
+        this.moveable = moveable;
+        this.writeable = writeable;
+        this.deleteable = deleteable;
     }
     
     public void addParent(Directory parent){
@@ -17,7 +25,12 @@ public class Directory {
     }
     
     public void rename(String newName){
-        this.name = newName;
+        if (renameable){
+            this.name = newName;
+        }
+        else {
+            System.out.println("Cannot rename this folder!");
+        }
     }
     
     public String getName(){
@@ -27,7 +40,17 @@ public class Directory {
     public void addSubDir(Directory newDir) {
         this.subDirs.add(newDir);
     }
- 
+
+    public boolean isSubDir(String dir){
+        boolean subDir = false;
+        for (int i = 0; i < subDirs.size(); i++){
+            if (subDirs.get(i).getName().equals(dir)){
+                subDir = true;
+            }
+        }
+        return subDir;
+    }
+
     public ArrayList<Directory> getDirs() {
         return this.subDirs;
     }
@@ -47,5 +70,30 @@ public class Directory {
     public File getFile(int i) {
         return this.fileObjs.get(i);
     }
- 
+
+    public boolean canDelete() {
+        return this.deleteable;
+    }
+
+    public boolean canMove() {
+        return this.moveable;
+    }
+
+    public boolean canWrite() {
+        return this.writeable;
+    }
+
+    public boolean canRename() {
+        return this.renameable;
+    }
+
+    public boolean delete(int indexToDelete){
+        this.subDirs.remove(indexToDelete);
+        return true;
+    }
+
+    public void clearContents(){
+        this.subDirs.clear();
+        this.fileObjs.clear();
+    }
 }

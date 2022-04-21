@@ -4,13 +4,13 @@ import java.util.regex.Pattern;
 
 public class Main
 {
-	static Directory root = new Directory("C:");
-	static Directory dsktp = new Directory("Desktop");
-	static Directory dcmnts = new Directory("Documents");
-	static Directory dwnlds = new Directory("Downloads");
-	static Directory pics = new Directory("Pictures");
-	static Directory music = new Directory("Music");
-	static Directory vids = new Directory("Videos");
+	static Directory root = new Directory("C:", false, false, true, false);
+	static Directory dsktp = new Directory("Desktop", false, false, true, false);
+	static Directory dcmnts = new Directory("Documents", false, false, true, false);
+	static Directory dwnlds = new Directory("Downloads", false, false, true, false);
+	static Directory pics = new Directory("Pictures", false, false, true, false);
+	static Directory music = new Directory("Music", false, false, true, false);
+	static Directory vids = new Directory("Videos", false, false, true, false);
 
 	static Directory currentDir = root;
 
@@ -74,7 +74,7 @@ public class Main
 	static Directory processCMD(Directory current, ArrayList<String> cmd){
 	    Directory currentDir = current;
 		// allow only certain inputs as commands
-	    String [] valid_cmds = {"mkdir", "mkfile", "rename", "cd", "ls"};
+	    String [] valid_cmds = {"mkdir", "mkfile", "rename", "cd", "ls", "rm"};
 	    if (Arrays.asList(valid_cmds).contains(cmd.get(0))){
 	        switch (cmd.get(0)){
 	            case "mkdir":
@@ -135,6 +135,12 @@ public class Main
 	                }
 	                currentDir = current;
 	                break;
+				case "rm":
+					if (cmd.size() == 2){
+						rm(currentDir, cmd.get(1));
+					} else {
+						System.out.println("Invalid command\n");
+					}
 	        }
 	    }
 	    else {
@@ -156,7 +162,7 @@ public class Main
 	        System.out.println("Directory already exists");
 	    }
 	    else {
-	        Directory dir = new Directory(name);
+	        Directory dir = new Directory(name, true, true, true, true);
 	        current.addSubDir(dir);
 	        dir.addParent(current);
 	    }
@@ -182,8 +188,10 @@ public class Main
 
 	// incomplete
 	static void rename(Directory current, String original, String nName){
+		Scanner input = new Scanner(System.in);
 		String oriName = original.replaceAll("\"", "");
 		String newName = nName.replaceAll("\"", "");
+		int fileOrFolder = 3;
 		boolean isFile = false;
 		boolean isDir = false;
 		int dirIndex = 0;
@@ -205,18 +213,39 @@ public class Main
 			}
 		}
 
-		// if object is file and directory, chose wich to rename
+		// if object is file and directory, chose which to rename
 		if (isDir && isFile){
 			System.out.println("Found 1 file and 1 folder matching that name. Which do you want to rename? [1] file [2] folder: ");
+			fileOrFolder = input.nextInt();
+			if (fileOrFolder == 2){
+				Directory dir = current.getDir(dirIndex);
+				// check if this dir is renameable
+				if (dir.canRename()){
+					dir.rename(newName);
+				} else {
+					System.out.println("Cannot rename folder!");
+				}
+			} else if (fileOrFolder == 1) {
+				File file = current.getFile(fileIndex);
+				file.rename(newName);
+			} else {
+				System.out.println("Input not valid");
+			}
 
 		}
 		// if object os directory only, rename
-		else if (isDir) {
+		else if (isDir && !isFile) {
 			Directory dir = current.getDir(dirIndex);
-			dir.rename(newName);
+			// check if this dir is renameable
+			if (dir.canRename()){
+				dir.rename(newName);
+			} else {
+				System.out.println("Cannot rename folder!");
+			}
+
 		}
 		// if object is file only, rename
-		else if (isFile) {
+		else if (isFile && !isDir) {
 			File file = current.getFile(fileIndex);
 			file.rename(newName);
 		}
@@ -261,6 +290,40 @@ public class Main
 		ArrayList<File> files = current.getFiles();
 		for (int i = 0; i < files.size(); i++){
 			System.out.println(files.get(i).getName() + "  ");
+		}
+	}
+
+	static void rm(Directory dir, String dirName){
+		String dirToDelete = dirName.replaceAll("\"", ""); 	//remove double quotes from directory name
+		Scanner input = new Scanner(System.in);
+		ArrayList<Directory> dirs = dir.getDirs();
+		int indexToDelete = 99999;
+		boolean hasFiles = false;
+		boolean hasSubDirs = false;
+		String proceed = null;
+
+		if (dir.isSubDir(dirToDelete)){
+			for (int i = 0; i < dirs.size(); i++){
+				if (dir.getDir(i).getName().equals(dirToDelete)) {
+					indexToDelete = i;
+				}
+			}
+			if (dir.getDir(indexToDelete).canDelete() && indexToDelete < dirs.size()){
+				System.out.println("This will delete folder and all contents. Proceed? [y/n]: ");
+				proceed = input.next();
+				input.close();
+				if (proceed.equalsIgnoreCase("y")){
+					dir.getDir(indexToDelete).clearContents();
+					dir.delete(indexToDelete);
+				} else {
+					System.out.println("Directory not deleted");
+				}
+
+			} else {
+				System.out.println("Directory cannot be deleted!");
+			}
+		} else {
+			System.out.println("Directory specified does not exist!");
 		}
 	}
 }
