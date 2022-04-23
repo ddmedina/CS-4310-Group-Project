@@ -62,6 +62,14 @@ public class Directory {
     public void addFile(File newFile){
         this.fileObjs.add(newFile);
     }
+
+    public void clearFile(int i){
+        this.fileObjs.remove(1);
+    }
+
+    public void clearDir(int i){
+        this.subDirs.remove(i);
+    }
     
     public ArrayList<File> getFiles() {
         return this.fileObjs;
@@ -87,13 +95,16 @@ public class Directory {
         return this.renameable;
     }
 
-    public boolean delete(int indexToDelete){
+    public boolean deleteDir(int indexToDelete){
+        this.subDirs.clear();
+        this.fileObjs.clear();
         this.subDirs.remove(indexToDelete);
         return true;
     }
 
-    public void clearContents(){
-        this.subDirs.clear();
-        this.fileObjs.clear();
+    public boolean deleteFile(int indexToDelete){
+        this.fileObjs.remove(indexToDelete);
+        return true;
     }
+
 }
