@@ -227,9 +227,6 @@ public class Main
 	static Directory cd(Directory current, String dirName){
 		String name = dirName.replaceAll("\"", ""); 	//remove double quotes from directory name
 		Directory newCurrentDir = null;
-		int index = 0;
-		ArrayList<Directory> dirs = current.getDirs();
-		boolean isSubDir = false;
 		int [] type = new int[2];
 
 		if (name.equals("..")){
@@ -238,34 +235,28 @@ public class Main
 			// prevent crashes by not allowing user to change directories to files
 			type = type(current, name);
 		}
-		if (name.equals("..") && current != root){
-			// as long as it's a directory, proceed
-			if (type[0] == 2) {
-				for (int i = 0; i < dirs.size(); i++) {
-					if (name.equals(dirs.get(i).getName())) {
-						isSubDir = true;
-						index = i;
-					}
+		if (type[0] == 2) {
+			// check if the current directory is the root
+			if (current.parent == null) {
+				if (name.equals("..")) {
+					System.out.println("In root directory!");
+					newCurrentDir = current;
+				} else if (current.isSubDir(name)) {
+					newCurrentDir = current.getDir(type[1]);
 				}
-				if (current == root) {
-					if (name.equals("..")) {
-						System.out.println("In root directory!");
-					} else if (isSubDir) {
-						newCurrentDir = current.getDir(index);
-					}
-				} else if (name.equals("..") || name.equals(current.parent.getName())) {
+			}
+			// if not the root and user wants to move up, get parent dir
+			else if (current.parent != null) {
+				if (name.equals("..") || name.equals(current.parent.getName())) {
 					newCurrentDir = current.parent;
-				} else if (isSubDir) {
-					newCurrentDir = current.getDir(index);
+				}
+				// if not the root and user wants to move down, get subdirectory
+				else if (current.isSubDir(name)) {
+					newCurrentDir = current.getDir(type[1]);
 				}
 			}
-			else {
-				System.out.println("Cannot use file as input!");
-				newCurrentDir = current;
-			}
-		}
-		else {
-			System.out.println("In root directory!");
+		} else {
+			System.out.println("Cannot use file as input!");
 			newCurrentDir = current;
 		}
 		return newCurrentDir;
@@ -332,7 +323,7 @@ public class Main
 		Directory toDir;
 		int [] fileObj =type(current, name);
 		int [] newDirInfo = new int[2];
-		
+
 		// case 1; toDir is ".."
 		// make sure we are not already in root directory
 		if (newDirName.equals("..")){
