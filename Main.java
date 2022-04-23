@@ -295,6 +295,7 @@ public class Main
 				System.out.print("This will delete folder and all contents. Proceed? [y/n]: ");
 				proceed = input.next();
 				if (proceed.equalsIgnoreCase("y")){
+					current.getDir(type[1]).clear();
 					current.deleteDir(type[1]);
 				} else {
 					System.out.println("Directory not deleted");
