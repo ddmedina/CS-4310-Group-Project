@@ -96,9 +96,13 @@ public class Directory {
     }
 
     public boolean deleteDir(int indexToDelete){
+        this.subDirs.remove(indexToDelete);
+        return true;
+    }
+
+    public boolean clear(){
         this.subDirs.clear();
         this.fileObjs.clear();
-        this.subDirs.remove(indexToDelete);
         return true;
     }
 
