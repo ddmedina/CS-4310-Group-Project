@@ -238,29 +238,34 @@ public class Main
 			// prevent crashes by not allowing user to change directories to files
 			type = type(current, name);
 		}
-
-		// as long as it's a directory, proceed
-		if (type[0] == 2) {
-			for (int i = 0; i < dirs.size(); i++) {
-				if (name.equals(dirs.get(i).getName())) {
-					isSubDir = true;
-					index = i;
+		if (name.equals("..") && current != root){
+			// as long as it's a directory, proceed
+			if (type[0] == 2) {
+				for (int i = 0; i < dirs.size(); i++) {
+					if (name.equals(dirs.get(i).getName())) {
+						isSubDir = true;
+						index = i;
+					}
 				}
-			}
-			if (current == root) {
-				if (name.equals("..")) {
-					System.out.println("In root directory!");
+				if (current == root) {
+					if (name.equals("..")) {
+						System.out.println("In root directory!");
+					} else if (isSubDir) {
+						newCurrentDir = current.getDir(index);
+					}
+				} else if (name.equals("..") || name.equals(current.parent.getName())) {
+					newCurrentDir = current.parent;
 				} else if (isSubDir) {
 					newCurrentDir = current.getDir(index);
 				}
-			} else if (name.equals("..") || name.equals(current.parent.getName())) {
-				newCurrentDir = current.parent;
-			} else if (isSubDir) {
-				newCurrentDir = current.getDir(index);
+			}
+			else {
+				System.out.println("Cannot use file as input!");
+				newCurrentDir = current;
 			}
 		}
 		else {
-			System.out.println("Cannot use file as input!");
+			System.out.println("In root directory!");
 			newCurrentDir = current;
 		}
 		return newCurrentDir;
@@ -327,54 +332,72 @@ public class Main
 		Directory toDir;
 		int [] fileObj =type(current, name);
 		int [] newDirInfo = new int[2];
+		
 		// case 1; toDir is ".."
+		// make sure we are not already in root directory
 		if (newDirName.equals("..")){
-			newDirInfo[0] = 2;
-			toDir = current.parent;
-			// case 1; object is a file
-			if (fileObj[0] == 1) {
-				File f = current.getFile(fileObj[1]);
-				toDir.addFile(f);
-				current.clearFile(fileObj[1]);
-				// case 2; object is a directory
-			} else if (fileObj[0] == 2){
-				Directory d = current.getDir(fileObj[1]);
-				toDir.addSubDir(d);
-				d.addParent(toDir);
-				current.clearDir(fileObj[1]);
+			if (current.parent == null){
+				System.out.println("In root directory, cannot process request!");
 			} else {
-				System.out.println("Invalid input!");
-			}
-		} else {
-			// case 2; toDir is the parent dir's name
-			if (current.parent.getName().equals(newDir)){
 				newDirInfo[0] = 2;
-				toDir = current.parent;
+				toDir = current.parent;		// ".." is the parent dir
+
 				// case 1; object is a file
 				if (fileObj[0] == 1) {
 					File f = current.getFile(fileObj[1]);
 					toDir.addFile(f);
 					current.clearFile(fileObj[1]);
+
 					// case 2; object is a directory
-				} else if (fileObj[0] == 2){
+				} else if (fileObj[0] == 2) {
 					Directory d = current.getDir(fileObj[1]);
 					toDir.addSubDir(d);
 					d.addParent(toDir);
 					current.clearDir(fileObj[1]);
+
+				} else {
+					System.out.println("Invalid input!");
+				}
+			}
+		} else {
+			// case 2; toDir is the parent dir's name
+			// make sure that we're not already in root directory
+			if (current.parent == null){
+				System.out.println("In root folder, cannot process request!");
+			}
+			else if (current.parent.getName().equals(newDir)){
+				newDirInfo[0] = 2;
+				toDir = current.parent;
+
+				// case 1; object is a file
+				if (fileObj[0] == 1) {
+					File f = current.getFile(fileObj[1]);
+					toDir.addFile(f);
+					current.clearFile(fileObj[1]);
+
+					// case 2; object is a directory
+				} else if (fileObj[0] == 2) {
+					Directory d = current.getDir(fileObj[1]);
+					toDir.addSubDir(d);
+					d.addParent(toDir);
+					current.clearDir(fileObj[1]);
+
 				} else {
 					System.out.println("Invalid input!");
 				}
 			}
 			// case 3; toDir is a subDir's name
 			else if (current.isSubDir(newDir)){
-				newDirInfo = type(current, name);
+				newDirInfo = type(current, newDirName);
 				if (newDirInfo[0] == 2){
 					toDir = current.getDir(newDirInfo[1]);
+
 					// case 1; object is a file
 					if (fileObj[0] == 1) {
 						File f = current.getFile(fileObj[1]);
 						toDir.addFile(f);
 						current.clearFile(fileObj[1]);
+
 						// case 2; object is a directory
 					} else if (fileObj[0] == 2){
 						Directory d = current.getDir(fileObj[1]);
