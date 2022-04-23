@@ -1,6 +1,8 @@
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.time.*;
 
 public class Main
 {
@@ -14,8 +16,11 @@ public class Main
 
 	static Directory currentDir = root;
 
+	static FCB block = new FCB();
+
 	public static void main(String[] args) {
 		Scanner scnr = new Scanner(System.in);
+
 
 		root.addSubDir(dsktp);
 		dsktp.addParent(root);
@@ -74,7 +79,7 @@ public class Main
 	static Directory processCMD(Directory current, ArrayList<String> cmd){
 		Directory currentDir = current;
 		// allow only certain inputs as commands
-		String [] valid_cmds = {"mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv"};
+		String [] valid_cmds = {"mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat"};
 		if (Arrays.asList(valid_cmds).contains(cmd.get(0))){
 			switch (cmd.get(0)){
 				case "mkdir":
@@ -179,6 +184,7 @@ public class Main
 	}
 
 	static void mkfile(Directory current, String fname){
+		block.addContent(fname, "");
 		String name = fname.replaceAll("\"", "");
 		ArrayList<File> files = current.getFiles();
 		boolean exists = false;
@@ -193,6 +199,7 @@ public class Main
 		else {
 			if (current.canWrite()){
 				File file = new File(name, true, true, true, true);
+				System.out.println(file.getmNum());
 				current.addFile(file);
 			} else {
 				System.out.println("Cannot write files!");
@@ -401,6 +408,11 @@ public class Main
 				}
 			}
 		}
+	}
+
+	static void cat(File file)
+	{
+
 	}
 
 	static int[] type(Directory current, String name){
