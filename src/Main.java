@@ -4,8 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.time.*;
 
-public class Main
-{
+public class Main {
 	static Directory root = new Directory("C:", false, false, true, false);
 	static Directory dsktp = new Directory("Desktop", false, false, true, false);
 	static Directory dcmnts = new Directory("Documents", false, false, true, false);
@@ -21,7 +20,6 @@ public class Main
 	public static void main(String[] args) {
 		Scanner scnr = new Scanner(System.in);
 
-
 		root.addSubDir(dsktp);
 		dsktp.addParent(root);
 		root.addSubDir(dcmnts);
@@ -35,20 +33,21 @@ public class Main
 		root.addSubDir(vids);
 		vids.addParent(root);
 
-		while(true){
+		while (true) {
 			// prints the absolute path to current directory
 			printPath(currentDir);
 
 			String input = scnr.nextLine();
 
-			// allows the user to create and travers files and folders with more than one word in its name
+			// allows the user to create and travers files and folders with more than one
+			// word in its name
 			ArrayList<String> list = new ArrayList<String>();
 			Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(input);
 			while (m.find())
 				list.add(m.group(1));
 
 			// exits terminal
-			if (list.get(0).equals("exit")){
+			if (list.get(0).equals("exit")) {
 				break;
 			}
 
@@ -59,33 +58,33 @@ public class Main
 		}
 	}
 
-	static void printPath(Directory current){
+	static void printPath(Directory current) {
 		System.out.println();
 		ArrayList<String> path = new ArrayList<String>();
-		while(true){
+		while (true) {
 			path.add(current.getName());
 			current = current.parent;
-			if (current == null){
+			if (current == null) {
 				break;
 			}
 		}
-		for (int i = path.size() - 1; i > -1; i--){
+		for (int i = path.size() - 1; i > -1; i--) {
 			System.out.print(path.get(i) + "\\");
 		}
 		System.out.print(">");
 
 	}
 
-	static Directory processCMD(Directory current, ArrayList<String> cmd){
+	static Directory processCMD(Directory current, ArrayList<String> cmd) {
 		Directory currentDir = current;
 		// allow only certain inputs as commands
-		String [] valid_cmds = {"mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat"};
-		if (Arrays.asList(valid_cmds).contains(cmd.get(0))){
-			switch (cmd.get(0)){
+		String[] valid_cmds = { "mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "help" };
+		if (Arrays.asList(valid_cmds).contains(cmd.get(0))) {
+			switch (cmd.get(0)) {
 				case "mkdir":
-					if (cmd.size() == 2){
+					if (cmd.size() == 2) {
 						mkdir(current, cmd.get(1));
-					} else if (cmd.size() == 1){
+					} else if (cmd.size() == 1) {
 						mkdir(current, "New Folder");
 					} else {
 						System.out.println("Invalid command\n");
@@ -94,9 +93,9 @@ public class Main
 					break;
 
 				case "mkfile":
-					if (cmd.size() == 2){
+					if (cmd.size() == 2) {
 						mkfile(current, cmd.get(1));
-					} else if (cmd.size() == 1){
+					} else if (cmd.size() == 1) {
 						mkfile(current, "New File");
 					} else {
 						System.out.println("Invalid command\n");
@@ -114,7 +113,7 @@ public class Main
 					break;
 
 				case "cd":
-					if (cmd.size() == 2){
+					if (cmd.size() == 2) {
 						currentDir = cd(current, cmd.get(1));
 					} else {
 						System.out.println("Invalid command\n");
@@ -122,15 +121,15 @@ public class Main
 					break;
 
 				case "ls":
-					if (cmd.size() == 1){
+					if (cmd.size() == 1) {
 						System.out.println("\nFolders:\n");
-						if (current.getDirs().size() == 0){
+						if (current.getDirs().size() == 0) {
 							System.out.println("** No Folders **");
 						} else {
 							viewDirs(current);
 						}
 						System.out.println("\nFiles:\n");
-						if (current.getFiles().size() == 0){
+						if (current.getFiles().size() == 0) {
 							System.out.println("** No Files **");
 						} else {
 							viewFiles(current);
@@ -142,7 +141,7 @@ public class Main
 					break;
 
 				case "rm":
-					if (cmd.size() == 2){
+					if (cmd.size() == 2) {
 						rm(currentDir, cmd.get(1));
 					} else {
 						System.out.println("Invalid command\n");
@@ -150,54 +149,63 @@ public class Main
 					break;
 
 				case "mv":
-					if (cmd.size() == 3){
+					if (cmd.size() == 3) {
 						move(currentDir, cmd.get(1), cmd.get(2));
 					} else {
 						System.out.println("Invalid command\n");
 					}
 					break;
+				case "find":
+					if (cmd.size() == 2)
+						System.out.println(find(currentDir, cmd.get(1)));
+					else
+						System.out.println("Invalid command\n");
+					break;
+				case "help":
+					if (cmd.size() == 1)
+						help();
+					else
+						System.out.println("Invalid command\n");
+					break;
 			}
-		}
-		else {
+		} else {
 			System.out.println("Invalid command\n");
 		}
 		return currentDir;
 	}
 
-	static void mkdir(Directory current, String dirName){
-		String name = dirName.replaceAll("\"", "");		//remove double quotes from directory name
+	static void mkdir(Directory current, String dirName) {
+		String name = dirName.replaceAll("\"", ""); // remove double quotes from directory name
 		ArrayList<Directory> dirs = current.getDirs();
 		boolean exists = false;
-		for (int i = 0; i < dirs.size(); i++){
-			if (name.equals(dirs.get(i).getName())){
+		for (int i = 0; i < dirs.size(); i++) {
+			if (name.equals(dirs.get(i).getName())) {
 				exists = true;
 			}
 		}
-		if (exists){
+		if (exists) {
 			System.out.println("Directory already exists");
-		}
-		else {
+		} else {
 			Directory dir = new Directory(name, true, true, true, true);
 			current.addSubDir(dir);
 			dir.addParent(current);
 		}
 	}
 
-	static void mkfile(Directory current, String fname){
+	static void mkfile(Directory current, String fname) {
 		block.addContent(fname, "");
 		String name = fname.replaceAll("\"", "");
 		ArrayList<File> files = current.getFiles();
 		boolean exists = false;
-		for (int i = 0; i < files.size(); i++){
-			if (name.equals(files.get(i).getName())){
+		for (int i = 0; i < files.size(); i++) {
+			if (name.equals(files.get(i).getName())) {
 				exists = true;
 			}
 		}
-		if (exists){
+		if (exists) {
 			System.out.println("File already exists");
-		}
-		else {
-			if (current.canWrite()){
+		} else {
+			if (current.canWrite()) {
 				File file = new File(name, true, true, true, true);
 				System.out.println(file.getmNum());
 				current.addFile(file);
@@ -207,17 +215,17 @@ public class Main
 		}
 	}
 
-	static void rename(Directory current, String original, String nName){
+	static void rename(Directory current, String original, String nName) {
 		Scanner input = new Scanner(System.in);
 		String oriName = original.replaceAll("\"", "");
 		String newName = nName.replaceAll("\"", "");
-		int [] type = type(current, oriName);
+		int[] type = type(current, oriName);
 
 		// if object is directory, rename
 		if (type[0] == 2) {
 			Directory dir = current.getDir(type[1]);
 			// check if this dir is renameable
-			if (dir.canRename()){
+			if (dir.canRename()) {
 				dir.rename(newName);
 			} else {
 				System.out.println("Cannot rename folder!");
@@ -231,12 +239,12 @@ public class Main
 		}
 	}
 
-	static Directory cd(Directory current, String dirName){
-		String name = dirName.replaceAll("\"", ""); 	//remove double quotes from directory name
+	static Directory cd(Directory current, String dirName) {
+		String name = dirName.replaceAll("\"", ""); // remove double quotes from directory name
 		Directory newCurrentDir = null;
-		int [] type = new int[2];
+		int[] type = new int[2];
 
-		if (name.equals("..")){
+		if (name.equals("..")) {
 			type[0] = 2;
 		} else {
 			// prevent crashes by not allowing user to change directories to files
@@ -269,35 +277,87 @@ public class Main
 		return newCurrentDir;
 	}
 
-	static void viewDirs(Directory current){
+	static void viewDirs(Directory current) {
 		ArrayList<Directory> dirs = current.getDirs();
-		for (int i = 0; i < dirs.size(); i++){
+		for (int i = 0; i < dirs.size(); i++) {
 			System.out.println(dirs.get(i).getName() + "  ");
 		}
 	}
 
-	static void viewFiles(Directory current){
+	static void viewFiles(Directory current) {
 		ArrayList<File> files = current.getFiles();
-		for (int i = 0; i < files.size(); i++){
+		for (int i = 0; i < files.size(); i++) {
 			System.out.println(files.get(i).getName() + "  ");
 		}
 	}
 
-	static void rm(Directory current, String name){
-		String toDelete = name.replaceAll("\"", ""); 	//remove double quotes from directory name
+	static void help() {
+		// ("mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find")
+		System.out.println("mkdir x: Create subdirectory x");
+		System.out.println("mkfile x: Create file x");
+		System.out.println("Rename x y: Rename file or directory x to y");
+		System.out.println("cd x: Change to directory x from current directory (use .. to back out)");
+		System.out.println("ls: Lists all files and subdirectories in current directory");
+		System.out.println("rm x: Removes directory or file if it is deletable");
+		System.out.println("mv x y: Moves file or directory x to specified directory y");
+		System.out.println("find x: Finds file or directory x within current directory and subdirectories");
+	}
+
+	static String find(Directory current, String filename) {
+		Boolean fileFound = false;
+		String path = "File/directory not found";
+
+		for (int i = 0; i < current.getFiles().size(); i++) { // search through current directory
+			if (current.getFile(i).getName().equals(filename)) {
+				fileFound = true;
+				path = "File " + filename + " found at " + current.getName();
+			}
+		}
+		if (fileFound == false) {
+
+			for (int i = 0; i < current.getDirs().size(); i++) { // search through all subdirs in current dir
+				if (current.getDir(i).getName().equals(filename)) {
+					fileFound = true;
+					path = "Directory " + filename + " found at " + current.getName();
+				}
+				if (fileFound == false) {
+					for (int j = 0; j < (current.getDir(i).getFiles()).size(); j++) { // search through subdir[i]
+						if (current.getDir(i).getFile(j).getName().equals(filename)) {
+							fileFound = true;
+							path = "File " + filename + " found at " + current.getDir(i).getName();
+						}
+
+					}
+					if (fileFound == false) {
+						for (int j = 0; j < (current.getDir(i).getDirs()).size(); j++) { // search through subdir[i]
+							if (current.getDir(i).getDir(j).getName().equals(filename)) {
+								path = "Directory " + filename + "  found at " + current.getDir(i).getName();
+							}
+
+						}
+					}
+				}
+			}
+		}
+		return path;
+
+	}
+
+	static void rm(Directory current, String name) {
+		String toDelete = name.replaceAll("\"", ""); // remove double quotes from directory name
 		Scanner input = new Scanner(System.in);
 		ArrayList<Directory> dirs = current.getDirs();
 		int indexToDelete = 99999;
 		boolean hasFiles = false;
 		boolean hasSubDirs = false;
 		String proceed = null;
-		int [] type = type(current, toDelete);
+		int[] type = type(current, toDelete);
 
-		if (type[0] == 2){
-			if (current.getDir(type[1]).canDelete()){
+		if (type[0] == 2) {
+			if (current.getDir(type[1]).canDelete()) {
 				System.out.print("This will delete folder and all contents. Proceed? [y/n]: ");
 				proceed = input.next();
-				if (proceed.equalsIgnoreCase("y")){
+				if (proceed.equalsIgnoreCase("y")) {
 					current.getDir(type[1]).clear();
 					current.deleteDir(type[1]);
 				} else {
@@ -308,10 +368,10 @@ public class Main
 				System.out.println("Directory cannot be deleted!");
 			}
 		} else if (type[0] == 1) {
-			if (current.getFile(type[1]).canDelete()){
+			if (current.getFile(type[1]).canDelete()) {
 				System.out.print("This will delete the file. Proceed? [y/n]: ");
 				proceed = input.next();
-				if (proceed.equalsIgnoreCase("y")){
+				if (proceed.equalsIgnoreCase("y")) {
 					current.deleteFile(type[1]);
 				} else {
 					System.out.println("File not deleted");
@@ -324,21 +384,21 @@ public class Main
 		}
 	}
 
-	static void move(Directory current, String oriName, String newDir){
-		String name = oriName.replaceAll("\"", ""); 	//remove double quotes from directory name
-		String newDirName = newDir.replaceAll("\"", ""); 	//remove double quotes from directory name
+	static void move(Directory current, String oriName, String newDir) {
+		String name = oriName.replaceAll("\"", ""); // remove double quotes from directory name
+		String newDirName = newDir.replaceAll("\"", ""); // remove double quotes from directory name
 		Directory toDir;
-		int [] fileObj =type(current, name);
-		int [] newDirInfo = new int[2];
+		int[] fileObj = type(current, name);
+		int[] newDirInfo = new int[2];
 
 		// case 1; toDir is ".."
 		// make sure we are not already in root directory
-		if (newDirName.equals("..")){
-			if (current.parent == null){
+		if (newDirName.equals("..")) {
+			if (current.parent == null) {
 				System.out.println("In root directory, cannot process request!");
 			} else {
 				newDirInfo[0] = 2;
-				toDir = current.parent;		// ".." is the parent dir
+				toDir = current.parent; // ".." is the parent dir
 
 				// case 1; object is a file
 				if (fileObj[0] == 1) {
@@ -360,10 +420,9 @@ public class Main
 		} else {
 			// case 2; toDir is the parent dir's name
 			// make sure that we're not already in root directory
-			if (current.parent == null){
+			if (current.parent == null) {
 				System.out.println("In root folder, cannot process request!");
-			}
-			else if (current.parent.getName().equals(newDir)){
+			} else if (current.parent.getName().equals(newDir)) {
 				newDirInfo[0] = 2;
 				toDir = current.parent;
 
@@ -385,9 +444,9 @@ public class Main
 				}
 			}
 			// case 3; toDir is a subDir's name
-			else if (current.isSubDir(newDir)){
+			else if (current.isSubDir(newDir)) {
 				newDirInfo = type(current, newDirName);
-				if (newDirInfo[0] == 2){
+				if (newDirInfo[0] == 2) {
 					toDir = current.getDir(newDirInfo[1]);
 
 					// case 1; object is a file
@@ -397,7 +456,7 @@ public class Main
 						current.clearFile(fileObj[1]);
 
 						// case 2; object is a directory
-					} else if (fileObj[0] == 2){
+					} else if (fileObj[0] == 2) {
 						Directory d = current.getDir(fileObj[1]);
 						toDir.addSubDir(d);
 						d.addParent(toDir);
@@ -410,15 +469,14 @@ public class Main
 		}
 	}
 
-	static void cat(File file)
-	{
+	static void cat(File file) {
 
 	}
 
-	static int[] type(Directory current, String name){
+	static int[] type(Directory current, String name) {
 		Scanner input = new Scanner(System.in);
-		String toMove = name.replaceAll("\"", ""); 	//remove double quotes from name
-		int [] fileType = new int[2];
+		String toMove = name.replaceAll("\"", ""); // remove double quotes from name
+		int[] fileType = new int[2];
 		int fileOrFolder = 3;
 		boolean isFile = false;
 		boolean isDir = false;
@@ -426,26 +484,27 @@ public class Main
 		int fileIndex = 0;
 
 		// search through subdirectories for matching name
-		for (int i = 0; i < current.getDirs().size(); i++){
-			if (current.getDir(i).getName().equals(toMove)){
+		for (int i = 0; i < current.getDirs().size(); i++) {
+			if (current.getDir(i).getName().equals(toMove)) {
 				isDir = true;
 				dirIndex = i;
 			}
 		}
 
 		// search through files for matching name
-		for (int i = 0; i < current.getFiles().size(); i++){
-			if (current.getFile(i).getName().equals(toMove)){
+		for (int i = 0; i < current.getFiles().size(); i++) {
+			if (current.getFile(i).getName().equals(toMove)) {
 				isFile = true;
 				fileIndex = i;
 			}
 		}
 
-		if (isDir && isFile){
-			System.out.println("Found 1 file and 1 folder matching that name. Which do you want to rename? [1] file [2] folder: ");
+		if (isDir && isFile) {
+			System.out.println(
+					"Found 1 file and 1 folder matching that name. Which do you want to rename? [1] file [2] folder: ");
 			fileOrFolder = input.nextInt();
 			input.close();
-			if (fileOrFolder == 2){
+			if (fileOrFolder == 2) {
 				fileType[0] = 2;
 				fileType[1] = dirIndex;
 			} else if (fileOrFolder == 1) {
@@ -454,10 +513,10 @@ public class Main
 			} else {
 				System.out.println("Input not valid");
 			}
-		} else if (isDir && !isFile){
+		} else if (isDir && !isFile) {
 			fileType[0] = 2;
 			fileType[1] = dirIndex;
-		} else if (isFile && !isDir){
+		} else if (isFile && !isDir) {
 			fileType[0] = 1;
 			fileType[1] = fileIndex;
 		}
