@@ -59,14 +59,14 @@ public class File {
     }
 
 
+    //Generating magic number by adding random numbers to the end of the file name then taking the MD5 hash of it
     private String generatemNum(String name) {
         Random r = new Random();
-        for(int i = 0; i < SALTLENGTH; i++)
-        {
+        for(int i = 0; i < SALTLENGTH; i++) {
             name += String.valueOf(r.nextInt(10));
 
         }
-        System.out.println(name);
+        //System.out.println(name);
         try{
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(name.getBytes());

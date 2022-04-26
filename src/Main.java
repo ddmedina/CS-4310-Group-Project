@@ -156,6 +156,12 @@ public class Main
 						System.out.println("Invalid command\n");
 					}
 					break;
+				case "cat":
+					if (cmd.size() == 2)
+					{
+						cat(currentDir, cmd.get(1));
+					}
+					break;
 			}
 		}
 		else {
@@ -184,7 +190,7 @@ public class Main
 	}
 
 	static void mkfile(Directory current, String fname){
-		block.addContent(fname, "");
+
 		String name = fname.replaceAll("\"", "");
 		ArrayList<File> files = current.getFiles();
 		boolean exists = false;
@@ -201,6 +207,8 @@ public class Main
 				File file = new File(name, true, true, true, true);
 				System.out.println(file.getmNum());
 				current.addFile(file);
+				//Adding new file's magicnumber to the FCB with the content
+				block.addContent(file.getmNum(), "This should hopefully work");
 			} else {
 				System.out.println("Cannot write files!");
 			}
@@ -410,9 +418,33 @@ public class Main
 		}
 	}
 
-	static void cat(File file)
+	static void cat(Directory current, String fname)
 	{
+		int fileIndex = 0;
+		boolean isFile = false;
+		String toPrint = fname.replaceAll("\"", "");
+		// search through files for matching name
+		for (int i = 0; i < current.getFiles().size(); i++){
+			if (current.getFile(i).getName().equals(toPrint)){
+				isFile = true;
+				fileIndex = i;
+			}
+		}
+		if(isFile)
+		{
+			String magicNum = current.getFile(fileIndex).getmNum();
+			System.out.println(block.getContent(magicNum));
+		}
+	}
 
+	static int findFile(Directory search, String fname)
+	{
+		for (int i = 0; i < search.getFiles().size(); i++){
+			if (search.getFile(i).getName().equals(fname)){
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	static int[] type(Directory current, String name){
