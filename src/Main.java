@@ -78,7 +78,7 @@ public class Main {
 	static Directory processCMD(Directory current, ArrayList<String> cmd) {
 		Directory currentDir = current;
 		// allow only certain inputs as commands
-		String[] valid_cmds = { "mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "help" };
+		String[] valid_cmds = { "mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "help", "write", "overwrite", "read" };
 		if (Arrays.asList(valid_cmds).contains(cmd.get(0))) {
 			switch (cmd.get(0)) {
 				case "mkdir":
@@ -160,6 +160,7 @@ public class Main {
 					{
 						cat(currentDir, cmd.get(1));
 					}
+					break;
 				case "find":
 					if (cmd.size() == 2)
 						System.out.println(find(currentDir, cmd.get(1)));
@@ -171,6 +172,27 @@ public class Main {
 						help();
 					else
 						System.out.println("Invalid command\n");
+					break;
+				case "write":
+					if (cmd.size() == 2){
+						write(currentDir, cmd.get(1));
+					} else {
+						System.out.println("Invalid command\n");
+					}
+					break;
+				case "overwrite":
+					if (cmd.size() == 2){
+						overwrite(currentDir, cmd.get(1));
+					} else {
+						System.out.println("Invalid command\n");
+					}
+					break;
+				case "read":
+					if (cmd.size() == 2){
+						read(currentDir, cmd.get(1));
+					} else {
+						System.out.println("Invalid command\n");
+					}
 					break;
 			}
 		} else {
@@ -550,7 +572,133 @@ public class Main {
 		} else if (isFile && !isDir) {
 			fileType[0] = 1;
 			fileType[1] = fileIndex;
+		} else {
+			fileType[0] = 9999;
+			fileType[1] = 9999;
 		}
 		return fileType;
+	}
+
+	static void write(Directory current, String name){
+		Scanner in = new Scanner(System.in);
+		String file = name.replaceAll("\"", ""); // remove double quotes from name
+		int [] type = type(current, file);
+		// name refers to a file object
+		if (type[0] == 1) {
+			// get access to file using dir index
+			File f = current.getFile(type[1]);
+			// feed file to handler
+			w_handling(f);
+		}
+		// name refers to a dir object
+		else if (type[0] == 2){
+			System.out.println("Cannot write to directories");
+		}
+		// no object w/ that name exists
+		else {
+			System.out.println("File does not exist in current directory! Create file? [y/n]");
+			String input = in.next();
+			if (input.equalsIgnoreCase("y")){
+				mkfile(current, file);
+			}
+		}
+	}
+
+	static void w_handling(File name){
+		Scanner in = new Scanner(System.in);
+		ArrayList<String> content = name.getContent();
+		while(true){
+			r_handling(name);
+			System.out.print(">>> ");
+			String input = in.nextLine();
+			if (input.equalsIgnoreCase("#x")){
+				break;
+			}
+			content.add(input);
+		}
+	}
+
+	static void overwrite(Directory current, String name){
+		Scanner in = new Scanner(System.in);
+		String file = name.replaceAll("\"", ""); // remove double quotes from name
+		int [] type = type(current, file);
+		// name refers to a file object
+		if (type[0] == 1) {
+			// get access to file using dir index
+			File f = current.getFile(type[1]);
+			// feed file to handler
+			ow_handling(f);
+		}
+		// name refers to a dir object
+		else if (type[0] == 2){
+			System.out.println("Cannot write to directories");
+		}
+		// no object w/ that name exists
+		else {
+			System.out.println("File does not exist in current directory! Create file? [y/n]");
+			String input = in.next();
+			if (input.equalsIgnoreCase("y")){
+				mkfile(current, file);
+			}
+		}
+	}
+
+	static void ow_handling(File name){
+		Scanner in = new Scanner(System.in);
+		ArrayList<String> content = name.getContent();
+		while(content.size()>0){
+			r_handling(name);
+			System.out.print("\nLine to change: ");
+			int index = in.nextInt();
+			in.nextLine();
+			if (index == 9999){
+				break;
+			}
+			System.out.print("Enter new line: ");
+			String line = in.nextLine();
+			content.set(index, line);
+		}
+		if (content.size()==0){
+			System.out.println("No content. Can't overwrite nothing!");
+		}
+	}
+
+	static void read(Directory current, String name){
+		Scanner in = new Scanner(System.in);
+		String file = name.replaceAll("\"", ""); // remove double quotes from name
+		int [] type = type(current, file);
+		// name refers to a file object
+		if (type[0] == 1) {
+			// get access to file using dir index
+			File f = current.getFile(type[1]);
+			// feed file to handler
+			r_handling(f);
+		}
+		// name refers to a dir object
+		else if (type[0] == 2){
+			System.out.println("Cannot read directories");
+		}
+		// no object w/ that name exists
+		else {
+			System.out.println("File does not exist in current directory! Create file? [y/n]");
+			String input = in.next();
+			if (input.equalsIgnoreCase("y")){
+				mkfile(current, file);
+			}
+		}
+	}
+
+	static void r_handling(File name){
+		ArrayList<String> content = name.getContent();
+
+		if (content.size() == 0){
+			System.out.println("\nCurrent Contents:");
+			System.out.println("*** No Content ***\n");
+		} else {
+			System.out.println("\nCurrent Contents:");
+			for (int i = 0; i < content.size(); i++) {
+				System.out.println("[" + i + "] " + content.get(i));
+			}
+		}
 	}
 }

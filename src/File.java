@@ -21,7 +21,7 @@ public class File {
         this.moveable = moveable;
         this.writeable = writeable;
         this.deleteable = deleteable;
-        this.content = null;
+        this.content = new ArrayList<String>();
     }
     
     public void rename(String newName){
@@ -56,6 +56,10 @@ public class File {
 
     public boolean canRename() {
         return this.renameable;
+    }
+
+    public ArrayList<String> getContent() {
+        return this.content;
     }
 
 
