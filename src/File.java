@@ -1,9 +1,13 @@
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 public class File {
  
+    public Path filePath;
+    public String dateLastAccessed;
+    public String dateCreated;
     public String mNum;
     public String name;
     private ArrayList<String> content = new ArrayList<String>();
@@ -22,6 +26,10 @@ public class File {
         this.writeable = writeable;
         this.deleteable = deleteable;
         this.content = new ArrayList<String>();
+        this.filePath = filePath;
+        this.dateCreated = dateCreated;
+        this.dateLastAccessed = dateLastAccessed;
+
     }
     
     public void rename(String newName){
@@ -61,6 +69,18 @@ public class File {
     public ArrayList<String> getContent() {
         return this.content;
     }
+
+    public Path getFilePath(){
+        return this.filePath;
+    }
+
+    public String getDateCreated(){
+        return this.dateCreated;
+    }
+    public String getDateLastAccessed(){
+        return this.dateLastAccessed;
+    }
+     
 
 
     //Generating magic number by adding random numbers to the end of the file name then taking the MD5 hash of it

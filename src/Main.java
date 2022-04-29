@@ -1,8 +1,10 @@
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
 	static Directory root = new Directory("C:", false, false, true, false);
@@ -78,7 +80,7 @@ public class Main {
 	static Directory processCMD(Directory current, ArrayList<String> cmd) {
 		Directory currentDir = current;
 		// allow only certain inputs as commands
-		String[] valid_cmds = { "mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "help", "write", "overwrite", "read" };
+		String[] valid_cmds = { "mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "help", "write", "overwrite", "read", "meta" };
 		if (Arrays.asList(valid_cmds).contains(cmd.get(0))) {
 			switch (cmd.get(0)) {
 				case "mkdir":
@@ -194,6 +196,12 @@ public class Main {
 						System.out.println("Invalid command\n");
 					}
 					break;
+				case "meta":
+					if (cmd.size() == 2)
+						meta(currentDir, cmd.get(1));
+					else
+						System.out.println("Invalid command\n");
+					break;	
 			}
 		} else {
 			System.out.println("Invalid command\n");
@@ -320,7 +328,7 @@ public class Main {
 	}
 
 	static void help() {
-		// ("mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find")
+		// ("mkdir", "mkfile", "rename", "cd", "ls", "rm", "mv", "cat", "find", "meta")
 		System.out.println("mkdir x: Create subdirectory x");
 		System.out.println("mkfile x: Create file x");
 		System.out.println("Rename x y: Rename file or directory x to y");
@@ -329,6 +337,7 @@ public class Main {
 		System.out.println("rm x: Removes directory or file if it is deletable");
 		System.out.println("mv x y: Moves file or directory x to specified directory y");
 		System.out.println("find x: Finds file or directory x within current directory and subdirectories");
+		System.out.println("meta x: Displays metadata of a file entered");
 	}
 
 	static String find(Directory current, String filename) {
@@ -700,5 +709,18 @@ public class Main {
 				System.out.println("[" + i + "] " + content.get(i));
 			}
 		}
+	}
+	
+	static void meta(Directory current, String name){
+		File f1 = new File(name, true, true, true, true); // file object
+		f1.filePath = Paths.get(name).toAbsolutePath(); // retrieves path of file whose name was entered in command line
+		System.out.println("Location: " + f1.filePath); // displays path where file is located
+		LocalDateTime obj = LocalDateTime.now(); // retrieves current date and time
+		DateTimeFormatter formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+		String formattedDateTime = obj.format(formatted);
+		f1.dateCreated = formattedDateTime;
+		System.out.println("Date created: " + f1.dateCreated); // shows date and time file was created
+		f1.dateLastAccessed = formattedDateTime;
+		System.out.println("Date last accessed: " + f1.dateLastAccessed);
 	}
 }
