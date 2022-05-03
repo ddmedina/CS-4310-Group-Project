@@ -191,13 +191,6 @@ public class Main {
 						System.out.println("Invalid command\n");
 					}
 					break;
-				case "read":
-					if (cmd.size() == 2){
-						read(currentDir, cmd.get(1));
-					} else {
-						System.out.println("Invalid command\n");
-					}
-					break;
 				case "meta":
 					if (cmd.size() == 2)
 						meta(currentDir, cmd.get(1));
@@ -348,6 +341,8 @@ public class Main {
 		System.out.println("mv x y: Moves file or directory x to specified directory y");
 		System.out.println("find x: Finds file or directory x within current directory and subdirectories");
 		System.out.println("meta x: Displays metadata of a file entered");
+		System.out.println("cat x: Displays content of a file");
+		System.out.println("write x: Allows you to write content to file");
 	}
 
 	static String find(Directory current, String filename) {
@@ -633,7 +628,7 @@ public class Main {
 		//ArrayList<String> content = name.getContent();
 		ArrayList<String> buffer = new ArrayList<String>();
 		while(true){
-			r_handling(name);
+			r_handling(name, buffer);
 			System.out.print(">>> ");
 			String input = in.nextLine();
 			if (input.equalsIgnoreCase("#x")){
@@ -679,7 +674,7 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 		ArrayList<String> content = name.getContent();
 		while(content.size()>0){
-			r_handling(name);
+			r_handling(name, content);
 			System.out.print("\nLine to change: ");
 			int index = in.nextInt();
 			in.nextLine();
@@ -695,41 +690,17 @@ public class Main {
 		}
 	}
 
-	static void read(Directory current, String name){
-		Scanner in = new Scanner(System.in);
-		String file = name.replaceAll("\"", ""); // remove double quotes from name
-		int [] type = type(current, file);
-		// name refers to a file object
-		if (type[0] == 1) {
-			// get access to file using dir index
-			File f = current.getFile(type[1]);
-			// feed file to handler
-			r_handling(f);
-		}
-		// name refers to a dir object
-		else if (type[0] == 2){
-			System.out.println("Cannot read directories");
-		}
-		// no object w/ that name exists
-		else {
-			System.out.println("File does not exist in current directory! Create file? [y/n]");
-			String input = in.next();
-			if (input.equalsIgnoreCase("y")){
-				mkfile(current, file);
-			}
-		}
-	}
+	static void r_handling(File name, ArrayList<String> buffer){
+		//ArrayList<String> content = name.getContent();
 
-	static void r_handling(File name){
-		ArrayList<String> content = name.getContent();
-
-		if (content.size() == 0){
+		if (buffer.size() == 0){
 			System.out.println("\nCurrent Contents:");
 			System.out.println("*** No Content ***\n");
 		} else {
 			System.out.println("\nCurrent Contents:");
-			for (int i = 0; i < content.size(); i++) {
-				System.out.println("[" + i + "] " + content.get(i));
+			System.out.println(block.getContent(name.getmNum()));
+			for (int i = 0; i < buffer.size(); i++) {
+				System.out.println("[" + i + "] " + buffer.get(i));
 			}
 		}
 	}
