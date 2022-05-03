@@ -241,10 +241,9 @@ public class Main {
 		} else {
 			if (current.canWrite()) {
 				File file = new File(name, true, true, true, true);
-				System.out.println(file.getmNum());
 				current.addFile(file);
 				//Adding new file's magicnumber to the FCB with the content
-				block.addContent(file.getmNum(), "This should hopefully work");
+				block.addContent(file.getmNum(), "");
 			} else {
 				System.out.println("Cannot write files!");
 			}
@@ -615,7 +614,8 @@ public class Main {
 
 	static void w_handling(File name){
 		Scanner in = new Scanner(System.in);
-		ArrayList<String> content = name.getContent();
+		//ArrayList<String> content = name.getContent();
+		ArrayList<String> buffer = new ArrayList<String>();
 		while(true){
 			r_handling(name);
 			System.out.print(">>> ");
@@ -623,8 +623,15 @@ public class Main {
 			if (input.equalsIgnoreCase("#x")){
 				break;
 			}
-			content.add(input);
+			buffer.add(input);
+			//content.add(input);
 		}
+		//Putting all of the content into a buffer and then writing that to a file via the FCB
+		String content = "";
+		for (String thing: buffer) {
+			content += thing + '\n';
+		}
+		block.addContent(name.getmNum(), content);
 	}
 
 	static void overwrite(Directory current, String name){
