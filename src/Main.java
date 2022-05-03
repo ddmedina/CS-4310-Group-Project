@@ -19,6 +19,8 @@ public class Main {
 
 	static FCB block = new FCB();
 
+	static File f1 = new File(null, true, true, true, true);
+
 	public static void main(String[] args) {
 		Scanner scnr = new Scanner(System.in);
 
@@ -244,6 +246,15 @@ public class Main {
 				current.addFile(file);
 				//Adding new file's magicnumber to the FCB with the content
 				block.addContent(file.getmNum(), "");
+				// create metadata for file created
+				f1.filePath = Paths.get(name).toAbsolutePath(); // retrieves path of file whose name was entered in command line
+				LocalDateTime timeCreated = LocalDateTime.now();
+				LocalDateTime timeAccessed1 = LocalDateTime.now(); // retrieves date and time of first access to file
+				DateTimeFormatter formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"); // formats date and time to be more readable
+				String formattedCreateDateTime = timeCreated.format(formatted);
+				String formattedAccessedDateTime1 = timeAccessed1.format(formatted);
+				f1.dateCreated = formattedCreateDateTime;
+				f1.dateLastAccessed = formattedAccessedDateTime1;
 			} else {
 				System.out.println("Cannot write files!");
 			}
@@ -521,6 +532,11 @@ public class Main {
 		{
 			String magicNum = current.getFile(fileIndex).getmNum();
 			System.out.println(block.getContent(magicNum));
+			// retrieves date and time of last time file was accessed
+			LocalDateTime lastTimeAccessed = LocalDateTime.now(); 
+			DateTimeFormatter formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+			String formattedDateTime = lastTimeAccessed.format(formatted);
+			f1.dateLastAccessed = formattedDateTime;
 		}
 	}
 
@@ -719,15 +735,9 @@ public class Main {
 	}
 	
 	static void meta(Directory current, String name){
-		File f1 = new File(name, true, true, true, true); // file object
 		f1.filePath = Paths.get(name).toAbsolutePath(); // retrieves path of file whose name was entered in command line
 		System.out.println("Location: " + f1.filePath); // displays path where file is located
-		LocalDateTime obj = LocalDateTime.now(); // retrieves current date and time
-		DateTimeFormatter formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
-		String formattedDateTime = obj.format(formatted);
-		f1.dateCreated = formattedDateTime;
 		System.out.println("Date created: " + f1.dateCreated); // shows date and time file was created
-		f1.dateLastAccessed = formattedDateTime;
 		System.out.println("Date last accessed: " + f1.dateLastAccessed);
 	}
 }
