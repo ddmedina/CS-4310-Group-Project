@@ -12,4 +12,5 @@ public class FCB {
     {
         return files.get(MagicNumber);
     }
+    public void deleteContent(String MagicNumber) { files.remove(MagicNumber); }
 }

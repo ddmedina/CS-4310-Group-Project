@@ -414,6 +414,7 @@ public class Main {
 				System.out.print("This will delete the file. Proceed? [y/n]: ");
 				proceed = input.next();
 				if (proceed.equalsIgnoreCase("y")) {
+					block.deleteContent(current.getFile(type[1]).getmNum());
 					current.deleteFile(type[1]);
 				} else {
 					System.out.println("File not deleted");
