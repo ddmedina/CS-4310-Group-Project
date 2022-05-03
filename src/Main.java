@@ -737,7 +737,7 @@ public class Main {
 	static void meta(Directory current, String name){
 		f1.filePath = Paths.get(name).toAbsolutePath(); // retrieves path of file whose name was entered in command line
 		System.out.println("Location: " + f1.filePath); // displays path where file is located
-		System.out.println("Date created: " + f1.dateCreated); // shows date and time file was created
-		System.out.println("Date last accessed: " + f1.dateLastAccessed);
+		System.out.println("Created: " + f1.dateCreated); // shows date and time file was created
+		System.out.println("Accessed: " + f1.dateLastAccessed);
 	}
 }
